@@ -21,7 +21,8 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const serviceCollection = client.db("geniusCarService").collection("services");
-    
+    const orderCollection = client.db('geniusCarService').collection('orders')
+    // ################ Read Operation ################
     app.get('/services', async(req,res)=>{
         const query = {};
         const cursor = serviceCollection.find(query);
@@ -36,7 +37,34 @@ async function run() {
         const service = await serviceCollection.findOne(query);
 
         res.send(service);
+    });
+    // ################ Read Operation ################
+
+    // ################ Create Operation ################
+    // creating order and store it to db
+
+    app.post('/orders', async(req,res)=>{
+        const order = req.body;
+        const result = await orderCollection.insertOne(order);
+        
+        res.send(result);
+    });
+    // ################ Create Operation ################
+    // ################ Read Operation ################
+    app.get('/orders', async(req, res)=>{
+        let query = {};
+        const getEmail = req.query.email;
+        
+        if(getEmail){
+            query = {email: getEmail};
+        }
+
+        const cursor = orderCollection.find(query);
+        const orders = await cursor.toArray();
+        
+        res.send(orders);
     })
+    // ################ Read Operation ################
   }
   
   finally { }
