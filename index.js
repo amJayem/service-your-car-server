@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const jwt = require('jsonwebtoken');
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 require('dotenv').config();
 
@@ -75,20 +76,29 @@ async function run() {
     });
     // ################ DELETE Operation ################
     // ################ UPDATE Operation ################
+    
     app.patch('/orders/:id', async(req, res)=>{
         const id = req.params.id;
         const status = req.body.status;
         const query = { _id: ObjectId(id)};
-        const updateDoc ={
+        const updatedDoc ={
             $set:{
                 status: status
             }
         };
-        const result = await orderCollection.updateOne(query, updateDoc);
+        const result = await orderCollection.updateOne(query, updatedDoc);
         res.send(result);
 
     })
     // ################ UPDATE Operation ################
+    // ################ JWT Operation ################
+    app.post('/jwt', (req,res)=>{
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '1h'}); // const jwt = require('jsonwebtoken');
+      res.send({token}); // send as object
+    });
+    // ################ JWT Operation ################
   }
   
   finally { }
